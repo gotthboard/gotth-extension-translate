@@ -1,0 +1,15 @@
+schema_version = 1
+project = "gotth-extension-translate"
+
+[[features]]
+id = "translation.contract"
+path = "workflow/features/translation-contract"
+status = "planned"
+depends_on = []
+prd = "docs/prd.md"
+architecture = "docs/architecture.md"
+implementation = "docs/implementation-spec.md"
+
+[release]
+stage = "unreleased"
+tag = ""
