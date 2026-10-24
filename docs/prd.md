@@ -1,122 +1,34 @@
 # Product requirements
 
-## Problem
+## Problem and boundary
 
-Mail messages, discussion posts, and selected Cloud documents need optional
-machine translation without embedding a model in every product or giving a
-translation process product authority. A generic webhook is the wrong
-mechanism: translation has a typed request/response contract, strict content
-bounds, privacy consequences, and language-quality claims.
+Mail messages, discussion posts, and explicitly selected Cloud text need optional machine translation without embedding a model in each product or granting product authority to a translation process. gotth-extension-translate is one out-of-process adapter. The host authenticates users, authorizes and reduces content, obtains consent, owns audit/retention/presentation, and pins artifact, manifest, grant, Session, and transport identity. The extension validates that boundary, calls only an authenticated local gotth-translate service, and returns bounded derived text. It never mutates canonical content.
 
-## Product boundary
+## V1 requirements
 
-`gotth-extension-translate` is one out-of-process extension. It implements one
-versioned translation interface and delegates translation to
-`gotth-translate`. The shared `gotth-extensions` protocol supplies only
-manifest, grant, negotiation, handshake, health, and lifecycle control.
-
-The future implementation baseline is the exact published
-`github.com/gotthboard/gotth-extensions` module at `v1.0.0` for foundation
-manifest, grant, negotiation, and session behavior, plus the exact published
-`github.com/gotthboard/gotth-sdk` module at `v1.0.0` for generated control
-messages and services. The extension must consume those published modules
-without a repository-local copy of generated control code.
-
-The host:
-
-- authenticates the user and authorizes the source resource;
-- chooses and reduces the exact text segments;
-- obtains any required consent and records audit;
-- owns original content, translated presentation, retention, and deletion;
-- pins the extension artifact, manifest digest, grant, and transport identity.
-
-The extension:
-
-- validates the effective grant and bounded translation request;
-- calls only the configured translation backend allowed by the grant;
-- returns derived text and bounded model/language metadata;
-- retains no product authority and never mutates canonical content.
-
-## Requirements
-
-- `TRX-001`: Advertise extension ID `gotth.extension.translate` and interface
-  `gotth.interface.translation` through an exact `gotth-extensions` manifest.
-- `TRX-002`: Accept only host-called, authenticated RPCs bound to an admitted
-  manifest digest, grant, interface version, and transport identity.
-- `TRX-003`: Accept ordered UTF-8 text segments with caller-generated opaque
-  segment IDs, source-language mode, target language, content kind, and an
-  explicit cache/retention class. Return one result per admitted segment in
-  the same order.
-- `TRX-004`: Use canonical BCP 47 language tags at the product boundary. A
-  backend-specific language ID is an internal mapping, not a public contract.
-- `TRX-005`: Bound serialized request bytes, segment count, per-segment bytes,
-  output expansion, deadlines, correlation IDs, and concurrent work. Reject
-  partial, duplicate, malformed, or over-limit input before backend work.
-- `TRX-006`: Treat translation as derived display data. Never rewrite, delete,
-  sign, send, publish, or otherwise mutate the host's canonical source.
-- `TRX-007`: Receive no raw MIME, attachments, hidden mail headers, rendered
-  HTML, product database connection, storage path, object key, authentication
-  token, administrator session, or arbitrary host callback.
-- `TRX-008`: Make network egress deny-by-default. A local `gotth-translate`
-  backend requires only its exact service identity. Any remote provider needs
-  a separate named egress/secret grant and visible host-owned disclosure and
-  consent.
-- `TRX-009`: Never log or place source or translated text in health, control,
-  audit, metrics, errors, traces, workflow evidence, or crash reports.
-- `TRX-010`: Advertise only languages and quality tiers backed by retained
-  evaluation evidence. Experimental languages remain visibly experimental.
-- `TRX-011`: Make synchronous requests read-only and safe to retry only before
-  an admitted backend result. Long-running work uses a separately admitted
-  `gotth-jobs` boundary rather than an invented extension callback.
-- `TRX-012`: Fail closed on backend timeout, ambiguous language mapping,
-  unsupported retention policy, malformed output, output expansion, or
-  incompatible interface version. The host keeps the original usable.
-- `TRX-013`: Keep Mail, BB, and Cloud adapters product-owned. One product's
-  grant, secret, cache, request, or audit state never authorizes another.
-- `TRX-014`: When implementation is activated, consume
-  `gotth-extensions v1.0.0` and generated control messages and services from
-  `gotth-sdk v1.0.0`; do not copy or vendor generated control code in this
-  repository.
+- TRX-001: advertise gotth.extension.translate and gotth.interface.translation major 1 minor 0 through the exact canonical manifest.
+- TRX-002: accept only deadline-bound authenticated Unix-socket RPCs bound to the admitted manifest, grant, complete Session, and service token.
+- TRX-003: accept ordered UTF-8 segments with opaque IDs, source tag or auto, target tag, content kind, and cache class; return exactly one ordered result per segment.
+- TRX-004: use canonical BCP 47 at the public boundary.
+- TRX-005: enforce 320 KiB request envelope, 256 segments, 64 KiB per segment, 256 KiB total source, bounded expansion, 1 MiB response, UUID correlation IDs, deadlines, and concurrency before backend work.
+- TRX-006: return derived display data only; never rewrite, delete, sign, send, publish, or persist host source.
+- TRX-007: expose no raw MIME, attachment, hidden header, rendered HTML, product database/session, storage path/key, credential, URL, or callback field.
+- TRX-008: permit only one supervisor-connected Unix backend authenticated by pinned kernel peer credentials, a pre-token HMAC readiness proof, a private client token, and exact model identity. V1 has no remote egress capability or secret grant.
+- TRX-009: never log or evidence source/translated text; record only stable classes, sizes, duration buckets, and correlation digests.
+- TRX-010: return only experimental or evaluated quality tiers supplied by the admitted backend. Hosts must not advertise quality without retained evaluation evidence.
+- TRX-011: perform no application or service-config retry. gRPC may transparently retry only when transport proves the backend did not process the attempt. Any failure after backend admission may have unknown outcome and must not be retried; asynchronous work belongs to gotth-jobs.
+- TRX-012: fail closed on timeout, cancellation, language ambiguity, unsupported retention, malformed/reordered backend output, identity mismatch, or expansion.
+- TRX-013: bind each product instance to its own grant, Session, and token; no product's authority admits another.
+- TRX-014: consume gotth-extensions v1.0.0 and gotth-sdk v1.0.0 directly without replacements or copied control code.
 
 ## Consumer requirements
 
-### GOTTH Mail
-
-Mail may send bounded decoded and sanitized visible body text only after
-mailbox authorization. The original message remains untouched. The extension
-receives no raw MIME, attachment bytes, credential, hidden header, or remote
-image URL.
-
-### GOTTH-BB
-
-Board authorizes the post before translation and protects Markdown structure,
-code blocks, links, mentions, and quote boundaries. Original Markdown remains
-canonical. Returned text is escaped and rendered by Board; the extension never
-returns executable HTML or frontend code.
-
-### GOTTH Cloud
-
-Cloud sends only explicitly selected, authorized, extractable text. It never
-silently uploads an encrypted/private file, full account tree, binary object,
-storage path, or object key. Large documents require the future jobs boundary.
+Mail sends decoded/sanitized visible text, never MIME/headers/attachments. Board tokenizes Markdown and protects code, links, mentions, and quote structure before translation. Cloud sends only explicit authorized extracted text, never encrypted/binary content or storage identifiers. The synthetic fixtures under testdata/consumers illustrate the intended reduced request shape and forbidden-field vocabulary; they do not prove any external consumer implementation. Consumer-owned integration remains a separate gate.
 
 ## Non-goals
 
-- UI localization, locale catalogs, date/number formatting, or RTL layout.
-- A translation model, model registry, or evaluation suite; those belong to
-  `gotth-translate`.
-- A generic plugin platform, webhook, event bus, workflow engine, or content
-  ingestion service.
-- Automatic translation of all mail, posts, or files.
-- Editing canonical content, sending mail, publishing posts, or writing files.
-- A release, deployment, or compatibility promise from these documents.
+UI localization, model training/registry/evaluation, remote providers, jobs, generic plugin/webhook/event APIs, automatic bulk translation, canonical-content mutation, product adapters, and deployment are outside v1.
 
 ## Acceptance
 
-The first alpha requires admitted translation and control contracts, exact
-artifact/manifest/grant identity, hostile parser and output tests, privacy and
-redaction proof, local-backend integration, negative egress tests, one
-consumer adapter fixture for each declared product, rollback evidence, and
-exact Forgejo/GitHub tag parity. Documentation alone satisfies none of those
-runtime gates. Selecting future dependency versions in this contract does not
-claim that runtime, test, artifact, or release evidence exists.
+Source acceptance requires exact dependency binding, owned descriptor compatibility, hostile bounds/output tests, privacy proof, authenticated local-backend/process integration, negative egress proof, consumer fixtures, allocation/latency evidence, clean clone, race/repeat/fuzz/coverage/vet/build, deterministic artifact with license/SBOM/provenance/rollback, and two clean reviews. Publication additionally requires an exact clean commit and separately authorized immutable Forgejo tag and hosted release. GitHub mirror handoff is outside this release gate.

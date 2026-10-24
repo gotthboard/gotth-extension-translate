@@ -1,0 +1,12 @@
+{
+  "product": "cloud",
+  "protected": ["/srv/cloud/users/alice/private.odt", "object-key-SECRET", "encrypted-file-bytes", "cloud-admin-token"],
+  "request": {
+    "correlation_id": "55555555-5555-5555-5555-555555555555",
+    "source_language": "auto",
+    "target_language": "de",
+    "content_kind": "document-text",
+    "cache_class": "none",
+    "segments": [{"id": "selection-1", "text": "Selected paragraph only."}]
+  }
+}

@@ -1,88 +1,25 @@
 # Implementation specification
 
-## Status
+## Status and dependencies
 
-This is a planned contract, not implemented code. Exact protobuf field numbers
-and release bounds are frozen only by the feature admission process. No
-runtime, tests, generated artifacts, or dependency graph exist in this
-repository yet.
+V1 is implemented in Go and remains an untagged release candidate. go.mod selects github.com/gotthboard/gotth-extensions v1.0.0 and github.com/gotthboard/gotth-sdk v1.0.0 without replace directives. Shared control messages/services are imported from the SDK. This repository owns only proto/gotth/translation/v1/translation.proto and its generated bindings.
 
-## Future dependency baseline
+## Wire contract
 
-When implementation is explicitly activated, it must use these exact
-published modules:
+Package gotth.translation.v1 exposes one host-facing unary method, Translation.Translate. It also defines private-backend-only BackendIdentity.Prove, which is never registered on the host socket. TranslateRequest fields are correlation_id=1, source_language=2, target_language=3, content_kind=4, cache_class=5, segments=6. Segment is id=1, text=2. TranslateResponse is target_language=1, results=2. SegmentResult is id=1, detected_source_language=2, text=3, quality_tier=4, model_identity=5, result_class=6. Exact enums and compatibility rules are in docs/compatibility-v1.md.
 
-- `github.com/gotthboard/gotth-extensions v1.0.0` for foundation manifest,
-  grant, negotiation, handshake, health, and lifecycle behavior;
-- `github.com/gotthboard/gotth-sdk v1.0.0` for generated extension-control
-  messages and services.
+Source language is auto or canonical BCP 47; target is a non-und canonical tag. Content kinds are plain, mail-visible-text, markdown-segment, and document-text. Cache classes are none and request. Segment IDs are 1..128-byte UTF-8 opaque non-space/non-control values. Text is nonempty UTF-8 without NUL.
 
-The implementation must select the published modules directly. It must not
-copy, vendor, or regenerate shared generated control code in this repository.
-The locally owned `gotth.interface.translation` definition remains separate
-from that shared control surface. These constraints are a future
-implementation baseline, not a claim that dependencies have been selected or
-verified here.
+## Admission and transport
 
-## Identity and manifest
+Runtime inputs are private owned regular files and private directories. Symlinks, permissive modes, noncanonical paths, duplicate/unknown JSON fields, noncanonical manifest/grant JSON, stale digests, extra capability/interface/secret authority, existing host socket paths, invalid inherited descriptors, and backend peer/proof mismatches fail startup. A unary interceptor requires a deadline and printable-ASCII service token before every host handler; handlers repeat transport checks defensively. Translate additionally requires the exact Session fingerprint inside the method. Control handshake/health use the published SDK.
 
-- repository: `gotth-extension-translate`
-- extension ID: `gotth.extension.translate`
-- control protocol: `gotth.extensions.control` major 1
-- business interface: `gotth.interface.translation` major 1
-- required capability: `translate.text`
-- optional capability: `translate.remote-egress`
-- optional named secret: `translation.remote-provider.credential`
+Only adoption of a connected Unix descriptor is compiled into the backend adapter. It consumes one supervisor-connected Unix descriptor, verifies SO_PEERCRED PID/UID/GID, completes a challenge HMAC before sending any token, and never redials a pathname. It then sends a backend token and exact caller ID, caps message sizes, propagates cancellation, and disables service-config/application retries. gRPC transparent retry remains possible only for attempts the transport proves unprocessed. READY follows this proof. Configuration pins the exact model identity and exactly one experimental or evaluated quality tier; results that claim another tier fail closed. No net/http, TLS, URL, subprocess, plugin, remote provider, or arbitrary network selection exists.
 
-## Synchronous request
+## Bounds and errors
 
-The initial request contains:
+The constants and stable lowercase error messages are in internal/translate/service.go and frozen by tests. Invalid requests never invoke the backend. Unknown enums/fields in owned Translate request, segment, response, and result messages fail. Imported SDK control messages retain protobuf unknown fields normally. Backend failure maps to backend_unavailable, timeout to backend_timeout, cancellation to request_cancelled, malformed output to malformed_backend_response, expansion to output_too_large, and saturation to capacity_exhausted. Errors contain no content or rejected value.
 
-- bounded correlation ID;
-- source language mode: canonical tag or `auto`;
-- one canonical BCP 47 target tag;
-- content kind: `plain`, `mail-visible-text`, `markdown-segment`, or
-  `document-text`;
-- explicit cache class: `none`, `request`, or a future admitted host policy;
-- ordered segments with opaque IDs and UTF-8 text.
+## Verification and artifacts
 
-Initial design ceilings are 256 segments, 64 KiB per segment, and 256 KiB of
-source text per synchronous request. They are release constants, not runtime
-escape hatches. The encoded envelope and returned expansion receive separate
-hard bounds. Larger work fails with a stable `request_too_large` result and may
-be routed by the host to a future jobs contract.
-
-The response repeats the admitted target tag and returns ordered segment
-results with detected source tag, translated UTF-8 text, quality tier, backend
-model identity, and stable result class. It returns no HTML. Missing,
-duplicate, reordered, over-expanded, invalid UTF-8, or unknown segment results
-invalidate the whole response.
-
-## Transport and egress
-
-The host authenticates a private transport identity bound to the effective
-extension session. Every call requires a deadline. The extension authenticates
-the exact configured backend service. Arbitrary request-supplied URLs are
-forbidden.
-
-Remote provider support is absent from the first implementation unless a
-specific provider contract, egress destination, secret slot, redaction test,
-consent surface, and retention statement are admitted together.
-
-## Consumer adapters
-
-- Mail parses MIME and selects visible decoded text before calling the
-  extension. Attachments and headers do not cross the boundary.
-- BB tokenizes canonical Markdown into protected structure and translatable
-  text segments. Board reassembles and escapes the result.
-- Cloud performs authorization, explicit selection, text extraction, and file
-  type/size checks before calling. The extension cannot open a Cloud object.
-
-## Verification
-
-Required coverage includes bounds, invalid UTF-8, BCP 47 mapping, duplicate
-segment IDs, timeout/cancellation, backend authentication, denied egress,
-malformed and over-expanded output, retry behavior, log/metric redaction,
-cross-product grant isolation, local backend integration, and consumer
-fixtures proving that raw MIME, Markdown structure, storage paths, encrypted
-content, and credentials do not cross the interface.
+Unit tests cover grant/session mutation, transport authentication, BCP 47, critical and exact request/result bounds, duplicates, timeout/cancellation, admitted backend concurrency, hostile output, privacy, descriptors, no-egress source, allocation/latency, local backend, and synthetic consumer-boundary fixtures. The compiled process test covers startup, socket permissions, unauthenticated rejection, handshake, translation, SIGTERM, socket cleanup, and stderr redaction. Scripts pin dependencies/generators, regenerate bindings, and build a deterministic archive containing binary, canonical manifest, project license, exact third-party license/notice texts, SPDX SBOM, exact provenance, checksums, upgrade, and rollback instructions.

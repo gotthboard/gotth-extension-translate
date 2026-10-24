@@ -1,0 +1,12 @@
+{
+  "product": "bb",
+  "protected": ["```go", "https://private.example/path", "@admin", "> quoted boundary"],
+  "request": {
+    "correlation_id": "44444444-4444-4444-4444-444444444444",
+    "source_language": "en",
+    "target_language": "fr",
+    "content_kind": "markdown-segment",
+    "cache_class": "request",
+    "segments": [{"id": "text-node-1", "text": "Release notes"}]
+  }
+}

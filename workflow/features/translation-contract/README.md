@@ -1,7 +1,5 @@
 # translation.contract
 
-Status: planned.
+Status: implemented; verification and admission pending.
 
-This feature admits the translation seam before code. It remains blocked on a
-license decision, exact wire contract, implementation, verification, release
-artifacts, and product-consumer evidence.
+The v1 source, owned interface, local adapter, tests, and release materials are present. Exact development-host evidence and two clean review passes must be sealed before admission. Commit, push, tag, Forgejo release, gotth-translate production adoption, consumer integration, deployment, and any GitHub mirror handoff remain separate.

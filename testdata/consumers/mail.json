@@ -1,0 +1,12 @@
+{
+  "product": "mail",
+  "protected": ["From: secret@example.test", "Content-Type: multipart/mixed", "ATTACHMENT-BYTES", "mailbox-token-SECRET"],
+  "request": {
+    "correlation_id": "33333333-3333-3333-3333-333333333333",
+    "source_language": "en",
+    "target_language": "es",
+    "content_kind": "mail-visible-text",
+    "cache_class": "none",
+    "segments": [{"id": "visible-body-1", "text": "Your order is ready."}]
+  }
+}

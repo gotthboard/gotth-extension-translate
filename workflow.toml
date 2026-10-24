@@ -4,14 +4,12 @@ project = "gotth-extension-translate"
 [[features]]
 id = "translation.contract"
 path = "workflow/features/translation-contract"
-status = "planned"
-# The published gotth-extensions v1.0.0 and gotth-sdk v1.0.0 modules are the
-# future implementation baseline. Keep dependencies empty until an explicit
-# implementation-activation change establishes real workflow prerequisites.
-depends_on = []
+status = "implemented"
+depends_on = ["gotth-extensions@v1.0.0", "gotth-sdk@v1.0.0"]
 prd = "docs/prd.md"
 architecture = "docs/architecture.md"
 implementation = "docs/implementation-spec.md"
+required_verification = ["format", "unit and hostile tests", "race", "repeat and shuffle", "fuzz smoke", "coverage review", "vet", "build", "compiled process", "no egress", "allocation and latency", "reproducible artifact", "clean clone", "dependency and security scans", "two cold reviews"]
 
 [release]
 stage = "unreleased"

@@ -2,67 +2,25 @@
 
 ## Data flow
 
-```text
-authorized product request
-  -> product-owned content reduction and consent
-  -> authenticated gotth.interface.translation RPC
-  -> gotth-extension-translate
-  -> admitted gotth-translate backend
-  -> bounded derived segment results
-  -> product-owned escaping, presentation, audit, and expiry
-```
+    authorized product request
+      -> product-owned reduction and consent
+      -> authenticated gotth.translation.v1 RPC on private Unix socket
+      -> strict manifest/grant/Session and request validation
+      -> authenticated gotth-translate RPC on one configured private Unix socket
+      -> strict whole-response validation
+      -> bounded derived segment results
+      -> product-owned escaping, display, audit, and expiry
 
-The extension is not an authorization service and is not a content store. The
-host reduces product objects to an ordered set of text segments. Product IDs
-remain opaque and optional; the extension does not fetch source content.
+The host owns product authority. gotth-translate owns language/model execution and evaluation evidence. This repository owns the translation seam and adapter validation. The extension has no product database, administrator session, general filesystem access, remote URL, or callback.
 
-## Authority split
+## Trust boundaries
 
-| Authority | Owner |
-| --- | --- |
-| User authentication and source authorization | consuming product |
-| Consent, disclosure, audit, retention, and presentation | consuming product |
-| Extension manifest/grant/session admission | consuming product using `gotth-extensions` |
-| Language registry, model adapters, quality evidence, batching, and backend cache | `gotth-translate` |
-| Translation-interface validation and backend adaptation | `gotth-extension-translate` |
-| Long-running job lifecycle | future admitted `gotth-jobs` integration |
+Startup strictly parses canonical manifest and grant bytes with gotth-extensions v1.0.0, negotiates against control 1.0 and translation 1.0, and requires exactly translate.text with no secrets. Every call re-negotiates from authoritative values and compares the complete Session. A private host token authenticates transport; Translate also binds the Session fingerprint. The supervisor supplies one connected Unix descriptor. Startup verifies its SO_PEERCRED PID/UID/GID and a token-keyed HMAC readiness proof before READY. The single-use dialer cannot reopen a replaced pathname. Translate then uses the private backend token, caller ID, timeout, exact model identity, and exact admitted quality tier.
 
-The extension gets no database or administrator session. A self-asserted
-extension ID is not authentication; transport identity is checked separately.
+The host-facing and local-backend RPC use the owned gotth.translation.v1 shape. This avoids inventing a generic backend payload while allowing gotth-translate to implement the seam directly. Authentication metadata differs by boundary and never enters protobuf messages.
 
-## Interface ownership
+## Failure, privacy, and cost
 
-This repository owns `gotth.interface.translation` because it is the first
-concrete implementation of the shared translation seam. The generic
-`gotth-extensions` control protocol remains business-operation free.
+Every host RPC passes deadline/token interception before its handler. Translate then validates Session and input before capacity admission or backend work. Admitted backend execution is bounded by a nonblocking semaphore and configured timeout; this is not a process-wide decoded-RPC limit. Cancellation propagates. Service-config and application retries are disabled; gRPC may transparently retry only an attempt proven unprocessed by the transport. Backend output is accepted only when target, count, order, IDs, languages, tier, class, model identity, UTF-8, expansion, and envelope size all match. Any defect rejects the whole response.
 
-Future implementation must consume foundation control behavior from the exact
-published `github.com/gotthboard/gotth-extensions v1.0.0` module and generated
-control messages and services from the exact published
-`github.com/gotthboard/gotth-sdk v1.0.0` module. This repository owns only its
-translation interface and adapter behavior; it must not copy, vendor, or
-regenerate a repository-local control implementation. Naming that baseline does
-not activate implementation or establish runtime compatibility.
-
-The synchronous interface is request/response and host-called. It does not
-create callbacks. A future jobs adapter must be specified as a separate
-contract rather than smuggling a queue into the control protocol.
-
-## Privacy and failure
-
-Requests are data-minimized before crossing the process boundary. Logs and
-metrics contain stable classes, sizes, language tags, duration buckets, and
-correlation digests—not content. A backend outage or malformed response
-returns a fixed failure and leaves the source unchanged.
-
-Local `gotth-translate` is the default topology. Remote providers are not
-enabled by a URL field alone: they require an exact provider configuration,
-named secret slot, egress grant, product disclosure, and user consent.
-
-## Cost model
-
-Text crosses one product-to-extension serialization boundary and one
-extension-to-service boundary. Segments are bounded to avoid whole-mailbox or
-whole-drive copies. Batch size trades model throughput against latency and
-memory; it is explicit and measured. Long documents leave the synchronous
-path instead of extending request deadlines until failure is unobservable.
+Text crosses two protobuf boundaries and one detached response slice. That copy prevents backend-owned result slices from becoming host-visible mutable state. Audit events contain no text or full correlation ID and enter a bounded nonblocking queue; blocked output can drop events but cannot stall RPC or shutdown. V1 stores no cache. NONE forbids backend post-call retention; REQUEST allows same-RPC memoization only. Host-owned longer retention is outside the process. Large or long-running documents fail and may later use a separately admitted jobs contract.

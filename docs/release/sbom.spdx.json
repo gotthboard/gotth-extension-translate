@@ -1,0 +1,159 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "gotth-extension-translate-1.0.0",
+  "documentNamespace": "https://git.dannyhunn.com/gotthboard/gotth-extension-translate/sbom/v1.0.0",
+  "creationInfo": {
+    "created": "2026-10-23T00:00:00Z",
+    "creators": [
+      "Tool: gotth-extension-translate-manual-inventory-v1"
+    ]
+  },
+  "packages": [
+    {
+      "name": "gotth-extension-translate",
+      "SPDXID": "SPDXRef-Package-root",
+      "versionInfo": "1.0.0",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT",
+      "licenseDeclared": "MIT",
+      "copyrightText": "Copyright (c) 2026 GOTTH Board contributors",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:golang/github.com/gotthboard/gotth-extension-translate@v1.0.0"
+        }
+      ]
+    },
+    {
+      "name": "github.com/gotthboard/gotth-extensions",
+      "SPDXID": "SPDXRef-Package-gotth-extensions",
+      "versionInfo": "v1.0.0",
+      "downloadLocation": "https://github.com/gotthboard/gotth-extensions",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT",
+      "licenseDeclared": "MIT",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "name": "github.com/gotthboard/gotth-sdk",
+      "SPDXID": "SPDXRef-Package-gotth-sdk",
+      "versionInfo": "v1.0.0",
+      "downloadLocation": "https://github.com/gotthboard/gotth-sdk",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT",
+      "licenseDeclared": "MIT",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "name": "golang.org/x/net",
+      "SPDXID": "SPDXRef-Package-x-net",
+      "versionInfo": "v0.60.0",
+      "downloadLocation": "https://pkg.go.dev/golang.org/x/net",
+      "filesAnalyzed": false,
+      "licenseConcluded": "BSD-3-Clause",
+      "licenseDeclared": "BSD-3-Clause",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "name": "golang.org/x/sys",
+      "SPDXID": "SPDXRef-Package-x-sys",
+      "versionInfo": "v0.48.0",
+      "downloadLocation": "https://pkg.go.dev/golang.org/x/sys",
+      "filesAnalyzed": false,
+      "licenseConcluded": "BSD-3-Clause",
+      "licenseDeclared": "BSD-3-Clause",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "name": "golang.org/x/text",
+      "SPDXID": "SPDXRef-Package-x-text",
+      "versionInfo": "v0.42.0",
+      "downloadLocation": "https://pkg.go.dev/golang.org/x/text",
+      "filesAnalyzed": false,
+      "licenseConcluded": "BSD-3-Clause",
+      "licenseDeclared": "BSD-3-Clause",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "name": "google.golang.org/genproto/googleapis/rpc",
+      "SPDXID": "SPDXRef-Package-genproto-rpc",
+      "versionInfo": "v0.0.0-20260526163538-3dc84a4a5aaa",
+      "downloadLocation": "https://pkg.go.dev/google.golang.org/genproto/googleapis/rpc",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Apache-2.0",
+      "licenseDeclared": "Apache-2.0",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "name": "google.golang.org/grpc",
+      "SPDXID": "SPDXRef-Package-grpc",
+      "versionInfo": "v1.83.2",
+      "downloadLocation": "https://pkg.go.dev/google.golang.org/grpc",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Apache-2.0",
+      "licenseDeclared": "Apache-2.0",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "name": "google.golang.org/protobuf",
+      "SPDXID": "SPDXRef-Package-protobuf",
+      "versionInfo": "v1.36.11",
+      "downloadLocation": "https://pkg.go.dev/google.golang.org/protobuf",
+      "filesAnalyzed": false,
+      "licenseConcluded": "BSD-3-Clause",
+      "licenseDeclared": "BSD-3-Clause",
+      "copyrightText": "NOASSERTION"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relationshipType": "DESCRIBES",
+      "relatedSpdxElement": "SPDXRef-Package-root"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-root",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-gotth-extensions"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-root",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-gotth-sdk"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-root",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-x-net"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-root",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-x-sys"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-root",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-x-text"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-root",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-genproto-rpc"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-root",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-grpc"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-root",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-protobuf"
+    }
+  ]
+}

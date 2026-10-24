@@ -1,29 +1,11 @@
 # Changelog
 
-## Unreleased
+## Unreleased — v1.0.0 candidate (2026-10-23)
 
-### 2026-10-23 — Set the future extensions v1 implementation baseline
-
-Update `README.md`, the product requirements, architecture, implementation
-specification, feature plan, and workflow records to select the exact published
-`gotth-extensions v1.0.0` and `gotth-sdk v1.0.0` modules as the future
-implementation baseline. Require generated extension-control messages and
-services to come from the SDK rather than a repository-local copied or vendored
-control implementation.
-
-The canonical feature remains `planned` with `depends_on = []` until an
-explicit implementation-activation change establishes real prerequisites.
-This documentation change creates no executable, dependency selection,
-runtime/test evidence, generated artifact, tag, release, deployment, or
-compatibility claim. Verification is limited to documentation, link, format,
-workflow-state, and scope checks.
-
-### 2026-09-21 — Establish the translation-extension contract
-
-Create the contract-only repository for the product-neutral translation
-adapter shared by GOTTH Mail, GOTTH-BB, and GOTTH Cloud. Define host-owned
-authorization, consent, content reduction, audit, retention, and presentation;
-the extension owns only bounded translation adaptation to `gotth-translate`.
-
-No executable, license grant, tag, release, deployment, or compatibility claim
-is created.
+- Added the owned gotth.translation.v1 unary translation contract and generated Go bindings.
+- Selected published gotth-extensions v1.0.0 and gotth-sdk v1.0.0 without replacements or local control copies.
+- Added canonical manifest/grant/complete Session admission, authenticated private Unix transport, bounded requests/responses, canonical BCP 47 handling, deadlines, cancellation, bounded backend execution, documented application errors, and privacy-safe events.
+- Added a supervisor-connected Unix-only gotth-translate adapter with pinned peer credentials, pre-token HMAC readiness proof, no pathname redial, exact model identity, no remote egress, and no application/service-config retry path; gRPC transparent proven-unprocessed retry remains possible.
+- Added pre-handler auth, blocked-audit, immediate terminate/restart, socket-substitution, hostile backend, consumer-fixture, redaction, no-egress, descriptor, allocation, latency, fuzz, and reproducible-artifact checks.
+- Selected MIT and added packaged third-party license/notice texts, exact SPDX/toolchain/provenance records, and release/upgrade/rollback procedures.
+- No commit, push, tag, release, credential, live provider, product repository, or deployment action was performed.

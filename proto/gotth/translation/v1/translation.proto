@@ -1,0 +1,87 @@
+syntax = "proto3";
+
+package gotth.translation.v1;
+
+option go_package = "github.com/gotthboard/gotth-extension-translate/proto/gotth/translation/v1;translationv1";
+
+// Translation is host-called and read-only. It returns derived display text.
+service Translation {
+  rpc Translate(TranslateRequest) returns (TranslateResponse);
+}
+
+// BackendIdentity is implemented only by the local gotth-translate backend.
+// The extension proves backend readiness before exposing its host socket.
+service BackendIdentity {
+  rpc Prove(BackendProofRequest) returns (BackendProofResponse);
+}
+
+enum ContentKind {
+  CONTENT_KIND_UNSPECIFIED = 0;
+  CONTENT_KIND_PLAIN = 1;
+  CONTENT_KIND_MAIL_VISIBLE_TEXT = 2;
+  CONTENT_KIND_MARKDOWN_SEGMENT = 3;
+  CONTENT_KIND_DOCUMENT_TEXT = 4;
+}
+
+enum CacheClass {
+  CACHE_CLASS_UNSPECIFIED = 0;
+  // Neither adapter nor backend may retain text after this RPC completes or
+  // reuse it in another RPC.
+  CACHE_CLASS_NONE = 1;
+  // Adapter/backend may memoize within this RPC only. Cross-RPC retention or
+  // reuse is forbidden; the host owns any longer-lived request cache.
+  CACHE_CLASS_REQUEST = 2;
+}
+
+enum QualityTier {
+  QUALITY_TIER_UNSPECIFIED = 0;
+  QUALITY_TIER_EXPERIMENTAL = 1;
+  QUALITY_TIER_EVALUATED = 2;
+}
+
+enum ResultClass {
+  RESULT_CLASS_UNSPECIFIED = 0;
+  RESULT_CLASS_TRANSLATED = 1;
+}
+
+message Segment {
+  string id = 1;
+  string text = 2;
+}
+
+message TranslateRequest {
+  string correlation_id = 1;
+  // Exactly "auto" or a canonical BCP 47 language tag.
+  string source_language = 2;
+  // A canonical BCP 47 language tag; "auto" is forbidden.
+  string target_language = 3;
+  ContentKind content_kind = 4;
+  CacheClass cache_class = 5;
+  repeated Segment segments = 6;
+}
+
+message SegmentResult {
+  string id = 1;
+  string detected_source_language = 2;
+  string text = 3;
+  QualityTier quality_tier = 4;
+  string model_identity = 5;
+  ResultClass result_class = 6;
+}
+
+message TranslateResponse {
+  string target_language = 1;
+  repeated SegmentResult results = 2;
+}
+
+message BackendProofRequest {
+  // Fresh, exactly 32-byte random challenge. It carries no credential.
+  bytes challenge = 1;
+}
+
+message BackendProofResponse {
+  // Exact request challenge.
+  bytes challenge = 1;
+  // HMAC-SHA-256 over the frozen backend-proof transcript.
+  bytes proof_hmac_sha256 = 2;
+}

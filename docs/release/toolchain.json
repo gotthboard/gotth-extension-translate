@@ -1,0 +1,27 @@
+{
+  "schema": "gotth.release.toolchain.v1",
+  "platform": "linux/amd64",
+  "goexperiment": "nodwarf5",
+  "tools": [
+    {
+      "name": "go",
+      "version_command_output": "go version go1.27.3-X:nodwarf5 linux/amd64",
+      "sha256": "21401c8d2dae2e6db0d756f7b9ae5a885ac6c14882cbbe521c6f49b184da8402"
+    },
+    {
+      "name": "protoc",
+      "version_command_output": "libprotoc 36.1",
+      "sha256": "4b7137d2236700cd9a6b92898ccbe3dd869917912e05017591af811c8387bfbf"
+    },
+    {
+      "name": "protoc-gen-go",
+      "version_command_output": "protoc-gen-go v1.36.11",
+      "sha256": "4be7d281ba025a9c3091ec3e2d43e11b87ea102c4617601792642faf8fd479da"
+    },
+    {
+      "name": "protoc-gen-go-grpc",
+      "version_command_output": "protoc-gen-go-grpc 1.6.2",
+      "sha256": "42d84fd65a6fddaf21319a6ec7275f568007921d14860f2728056ee900d5a25c"
+    }
+  ]
+}

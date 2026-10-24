@@ -1,8 +1,5 @@
 # Security policy
 
-No release is supported yet. Report vulnerabilities privately through the
-GOTTH security-reporting channel rather than a public issue.
+This is an untagged v1.0.0 candidate with no deployed supported release. Report vulnerabilities privately through the GOTTH security-reporting channel. Do not open public reports containing source/translated text, credentials, tokens, paths, object keys, private model output, or product identifiers; use synthetic fixtures and redacted stable classes.
 
-Do not include source text, translated text, credentials, tokens, message
-content, file content, storage identifiers, or private provider responses in a
-report. Use synthetic fixtures and bounded redacted evidence.
+The process must run as an unprivileged user with private configuration/token files and 0700 socket directories. Rotate both host and backend tokens and replace the complete manifest/grant/Session binding after suspected compromise. Revoke routing before shutdown and follow docs/release/ROLLBACK.md. Remote provider egress is not part of v1.
