@@ -92,8 +92,8 @@ data = {"schema":"gotth.release.provenance.v1","version":version,"platform":"lin
 pathlib.Path(path).write_text(json.dumps(data, sort_keys=True, separators=(",", ":")) + "\n")
 PY
 (cd "$stage/$name" && find . -type f ! -name SHA256SUMS -print0 | LC_ALL=C sort -z | xargs -0 sha256sum > SHA256SUMS)
-chmod 0755 "$stage/$name"
-find "$stage/$name" -type d -exec chmod 0755 {} +
+chmod 00755 "$stage/$name"
+find "$stage/$name" -type d -exec chmod 00755 {} +
 find "$stage/$name" -type f -exec chmod 0644 {} +
 chmod 0755 "$stage/$name/gotth-extension-translate"
 temporary_tar="$stage/$name.tar"
@@ -113,10 +113,12 @@ sidecar="$archive.sha256"
 digest=$(sha256sum "$temporary" | cut -d' ' -f1)
 printf '%s  %s\n' "$digest" "$name.tar.gz" > "$temporary.sha256"
 (cd "$stage" && sha256sum -c "$name.tar.gz.sha256" >/dev/null)
+trap '' HUP INT TERM
 ln "$temporary" "$archive"
 published_archive=1
 ln "$temporary.sha256" "$sidecar"
 published_sidecar=1
+trap abort HUP INT TERM
 sync -d "$archive" "$sidecar" "$output"
 published_archive=
 published_sidecar=

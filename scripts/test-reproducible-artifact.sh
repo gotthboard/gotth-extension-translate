@@ -25,8 +25,16 @@ cmp "$left/$name.tar.gz" "$right/$name.tar.gz"
 (cd "$left" && sha256sum -c "$name.tar.gz.sha256")
 cmp "$left/$name.tar.gz.sha256" "$right/$name.tar.gz.sha256"
 test "$(awk '{print $2}' "$left/$name.tar.gz.sha256")" = "$name.tar.gz"
+setgid_parent="$left/setgid-parent"
+mkdir -p "$setgid_parent"
+chmod 02775 "$setgid_parent"
+build "$setgid_parent/output" >/dev/null
+cmp "$left/$name.tar.gz" "$setgid_parent/output/$name.tar.gz"
+cmp "$left/$name.tar.gz.sha256" "$setgid_parent/output/$name.tar.gz.sha256"
 tar -xzf "$left/$name.tar.gz" -C "$extract"
 test "$(stat -c %a "$extract/$name/gotth-extension-translate")" = 755
+test "$(stat -c %a "$extract/$name")" = 755
+test -z "$(find "$extract/$name" -type d ! -perm 0755 -print -quit)"
 test "$("$extract/$name/gotth-extension-translate" --version)" = 1.0.0
 (cd "$extract/$name" && sha256sum -c SHA256SUMS)
 python3 - "$extract/$name" "$dirty" <<'PY'
@@ -81,3 +89,21 @@ if env $override REAL_TAR="$real_tar" PATH="$failbin:$PATH" SOURCE_DATE_EPOCH="$
 fi
 test ! -e "$failure_output/$name.tar.gz"
 test ! -e "$failure_output/$name.tar.gz.sha256"
+real_ln=$(command -v ln)
+signalbin="$left/signalbin"
+signal_output="$left/injected-publication-signal"
+signal_state="$left/injected-publication-signal.state"
+mkdir -p "$signalbin"
+cat > "$signalbin/ln" <<'SH'
+#!/bin/sh
+"$REAL_LN" "$@"
+if [ ! -e "$SIGNAL_STATE" ]; then
+  : > "$SIGNAL_STATE"
+  kill -TERM "$PPID"
+fi
+SH
+chmod 0755 "$signalbin/ln"
+env $override REAL_LN="$real_ln" SIGNAL_STATE="$signal_state" PATH="$signalbin:$PATH" SOURCE_DATE_EPOCH="$epoch" "$root/scripts/build-artifact.sh" 1.0.0 "$signal_output" >/dev/null
+test -e "$signal_output/$name.tar.gz"
+test -e "$signal_output/$name.tar.gz.sha256"
+(cd "$signal_output" && sha256sum -c "$name.tar.gz.sha256" >/dev/null)
