@@ -36,6 +36,14 @@ This repository owns `gotth.interface.translation` because it is the first
 concrete implementation of the shared translation seam. The generic
 `gotth-extensions` control protocol remains business-operation free.
 
+Future implementation must consume foundation control behavior from the exact
+published `github.com/gotthboard/gotth-extensions v1.0.0` module and generated
+control messages and services from the exact published
+`github.com/gotthboard/gotth-sdk v1.0.0` module. This repository owns only its
+translation interface and adapter behavior; it must not copy, vendor, or
+regenerate a repository-local control implementation. Naming that baseline does
+not activate implementation or establish runtime compatibility.
+
 The synchronous interface is request/response and host-called. It does not
 create callbacks. A future jobs adapter must be specified as a separate
 contract rather than smuggling a queue into the control protocol.

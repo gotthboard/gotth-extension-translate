@@ -3,7 +3,26 @@
 ## Status
 
 This is a planned contract, not implemented code. Exact protobuf field numbers
-and release bounds are frozen only by the feature admission process.
+and release bounds are frozen only by the feature admission process. No
+runtime, tests, generated artifacts, or dependency graph exist in this
+repository yet.
+
+## Future dependency baseline
+
+When implementation is explicitly activated, it must use these exact
+published modules:
+
+- `github.com/gotthboard/gotth-extensions v1.0.0` for foundation manifest,
+  grant, negotiation, handshake, health, and lifecycle behavior;
+- `github.com/gotthboard/gotth-sdk v1.0.0` for generated extension-control
+  messages and services.
+
+The implementation must select the published modules directly. It must not
+copy, vendor, or regenerate shared generated control code in this repository.
+The locally owned `gotth.interface.translation` definition remains separate
+from that shared control surface. These constraints are a future
+implementation baseline, not a claim that dependencies have been selected or
+verified here.
 
 ## Identity and manifest
 

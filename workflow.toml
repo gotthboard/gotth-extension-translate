@@ -5,6 +5,9 @@ project = "gotth-extension-translate"
 id = "translation.contract"
 path = "workflow/features/translation-contract"
 status = "planned"
+# The published gotth-extensions v1.0.0 and gotth-sdk v1.0.0 modules are the
+# future implementation baseline. Keep dependencies empty until an explicit
+# implementation-activation change establishes real workflow prerequisites.
 depends_on = []
 prd = "docs/prd.md"
 architecture = "docs/architecture.md"

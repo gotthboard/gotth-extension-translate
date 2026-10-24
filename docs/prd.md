@@ -15,6 +15,13 @@ versioned translation interface and delegates translation to
 `gotth-translate`. The shared `gotth-extensions` protocol supplies only
 manifest, grant, negotiation, handshake, health, and lifecycle control.
 
+The future implementation baseline is the exact published
+`github.com/gotthboard/gotth-extensions` module at `v1.0.0` for foundation
+manifest, grant, negotiation, and session behavior, plus the exact published
+`github.com/gotthboard/gotth-sdk` module at `v1.0.0` for generated control
+messages and services. The extension must consume those published modules
+without a repository-local copy of generated control code.
+
 The host:
 
 - authenticates the user and authorizes the source resource;
@@ -66,6 +73,10 @@ The extension:
   incompatible interface version. The host keeps the original usable.
 - `TRX-013`: Keep Mail, BB, and Cloud adapters product-owned. One product's
   grant, secret, cache, request, or audit state never authorizes another.
+- `TRX-014`: When implementation is activated, consume
+  `gotth-extensions v1.0.0` and generated control messages and services from
+  `gotth-sdk v1.0.0`; do not copy or vendor generated control code in this
+  repository.
 
 ## Consumer requirements
 
@@ -107,4 +118,5 @@ artifact/manifest/grant identity, hostile parser and output tests, privacy and
 redaction proof, local-backend integration, negative egress tests, one
 consumer adapter fixture for each declared product, rollback evidence, and
 exact Forgejo/GitHub tag parity. Documentation alone satisfies none of those
-runtime gates.
+runtime gates. Selecting future dependency versions in this contract does not
+claim that runtime, test, artifact, or release evidence exists.

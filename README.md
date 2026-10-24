@@ -14,6 +14,13 @@ This repository currently contains contracts only. It is planned and
 unreleased; it contains no executable, image, tag, release, deployment, or
 compatibility claim.
 
+Future implementation is based on the exact published
+`github.com/gotthboard/gotth-extensions v1.0.0` module and the exact
+published `github.com/gotthboard/gotth-sdk v1.0.0` module. Those versions are
+a design baseline, not evidence that implementation has started.
+Shared generated control messages and services must be imported from the SDK;
+this repository must not copy or vendor generated control code.
+
 Read the documents in this order:
 
 1. [`docs/prd.md`](docs/prd.md)
