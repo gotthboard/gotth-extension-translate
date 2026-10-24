@@ -120,6 +120,5 @@ ln "$temporary.sha256" "$sidecar"
 published_sidecar=1
 trap abort HUP INT TERM
 sync -d "$archive" "$sidecar" "$output"
-published_archive=
-published_sidecar=
+published_archive= published_sidecar=
 cat "$sidecar"

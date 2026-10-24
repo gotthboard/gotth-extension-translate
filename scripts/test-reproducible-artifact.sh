@@ -107,3 +107,19 @@ env $override REAL_LN="$real_ln" SIGNAL_STATE="$signal_state" PATH="$signalbin:$
 test -e "$signal_output/$name.tar.gz"
 test -e "$signal_output/$name.tar.gz.sha256"
 (cd "$signal_output" && sha256sum -c "$name.tar.gz.sha256" >/dev/null)
+real_sync=$(command -v sync)
+syncbin="$left/syncbin"
+sync_output="$left/injected-post-sync-signal"
+mkdir -p "$syncbin"
+cat > "$syncbin/sync" <<'SH'
+#!/bin/sh
+"$REAL_SYNC" "$@"
+kill -TERM "$PPID"
+SH
+chmod 0755 "$syncbin/sync"
+if env $override REAL_SYNC="$real_sync" PATH="$syncbin:$PATH" SOURCE_DATE_EPOCH="$epoch" "$root/scripts/build-artifact.sh" 1.0.0 "$sync_output" >/dev/null 2>&1; then
+  echo 'injected post-sync signal was accepted' >&2
+  exit 1
+fi
+test ! -e "$sync_output/$name.tar.gz"
+test ! -e "$sync_output/$name.tar.gz.sha256"
