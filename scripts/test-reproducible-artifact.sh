@@ -22,6 +22,9 @@ build "$left" >/dev/null
 build "$right" >/dev/null
 name=gotth-extension-translate-1.0.0-linux-amd64
 cmp "$left/$name.tar.gz" "$right/$name.tar.gz"
+(cd "$left" && sha256sum -c "$name.tar.gz.sha256")
+cmp "$left/$name.tar.gz.sha256" "$right/$name.tar.gz.sha256"
+test "$(awk '{print $2}' "$left/$name.tar.gz.sha256")" = "$name.tar.gz"
 tar -xzf "$left/$name.tar.gz" -C "$extract"
 test "$(stat -c %a "$extract/$name/gotth-extension-translate")" = 755
 test "$("$extract/$name/gotth-extension-translate" --version)" = 1.0.0
@@ -53,10 +56,28 @@ for field, file in [("sbom_sha256", "sbom.spdx.json"), ("toolchain_sha256", "too
     if provenance[field] != hashlib.sha256((root / file).read_bytes()).hexdigest():
         raise SystemExit(f"provenance digest mismatch: {field}")
 PY
-before=$(sha256sum "$right/$name.tar.gz" | cut -d' ' -f1)
+before=$(sha256sum "$right/$name.tar.gz" "$right/$name.tar.gz.sha256")
 if build "$right" >/dev/null 2>&1; then echo 'existing artifact replaced' >&2; exit 1; fi
-test "$before" = "$(sha256sum "$right/$name.tar.gz" | cut -d' ' -f1)"
+test "$before" = "$(sha256sum "$right/$name.tar.gz" "$right/$name.tar.gz.sha256")"
 if SOURCE_DATE_EPOCH="$epoch" "$root/scripts/build-artifact.sh" 1.0.0-alpha.1 "$right/alpha" >/dev/null 2>&1; then echo 'unsupported prerelease artifact accepted' >&2; exit 1; fi
 if [ "$dirty" = true ]; then override=GOTTH_EXTENSION_ALLOW_DIRTY_EVIDENCE=1; else override=; fi
 if env $override SOURCE_DATE_EPOCH="$epoch" "$root/scripts/build-artifact.sh" 1.0.0 "$root/.artifact-output-test" >/dev/null 2>&1; then echo 'in-tree artifact output accepted' >&2; exit 1; fi
 test ! -e "$root/.artifact-output-test"
+real_tar=$(command -v tar)
+failbin="$left/failbin"
+failure_output="$left/injected-archive-failure"
+mkdir -p "$failbin"
+cat > "$failbin/tar" <<'SH'
+#!/bin/sh
+for argument do
+  [ "$argument" != --format=ustar ] || exit 97
+done
+exec "$REAL_TAR" "$@"
+SH
+chmod 0755 "$failbin/tar"
+if env $override REAL_TAR="$real_tar" PATH="$failbin:$PATH" SOURCE_DATE_EPOCH="$epoch" "$root/scripts/build-artifact.sh" 1.0.0 "$failure_output" >/dev/null 2>&1; then
+  echo 'injected archive-creation failure was accepted' >&2
+  exit 1
+fi
+test ! -e "$failure_output/$name.tar.gz"
+test ! -e "$failure_output/$name.tar.gz.sha256"

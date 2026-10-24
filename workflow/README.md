@@ -1,3 +1,3 @@
 # Workflow
 
-workflow.toml is canonical. translation.contract is implemented in the working candidate and requires revision-matched development-host verification before admission. Implemented does not mean committed, admitted, tagged, published, deployed, or consumer-accepted. Release remains unreleased; external side effects are outside this task.
+workflow.toml is canonical. translation.contract is a committed, revision-matched, verified release candidate. Candidate status does not mean tagged, published, deployed, or consumer-accepted. The v1.0.0 tag and every external side effect remain outside this state.

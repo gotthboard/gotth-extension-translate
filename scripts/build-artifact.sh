@@ -27,7 +27,23 @@ export GOENV=off GOTOOLCHAIN=local GOPROXY=off GOSUMDB=off GOFLAGS=-mod=readonly
 go mod verify
 "$root/scripts/verify-release-metadata.sh" >/dev/null
 stage=$(mktemp -d "$output/.gotth-extension-translate.XXXXXX")
-trap 'rm -rf "$stage"' EXIT HUP INT TERM
+published_archive=
+published_sidecar=
+archive=
+sidecar=
+cleanup() {
+  status=$?
+  trap - EXIT
+  if [ "$status" -ne 0 ]; then
+    [ -z "$published_sidecar" ] || rm -f -- "$sidecar"
+    [ -z "$published_archive" ] || rm -f -- "$archive"
+  fi
+  rm -rf -- "$stage"
+  exit "$status"
+}
+abort() { exit 1; }
+trap cleanup EXIT
+trap abort HUP INT TERM
 source_root=$root
 if [ "$dirty" = false ]; then
   source_root="$stage/source"
@@ -80,10 +96,28 @@ chmod 0755 "$stage/$name"
 find "$stage/$name" -type d -exec chmod 0755 {} +
 find "$stage/$name" -type f -exec chmod 0644 {} +
 chmod 0755 "$stage/$name/gotth-extension-translate"
+temporary_tar="$stage/$name.tar"
 temporary="$stage/$name.tar.gz"
-tar --format=ustar --sort=name --mtime="@$epoch" --owner=0 --group=0 --numeric-owner -C "$stage" -cf - "$name" | gzip -n > "$temporary"
+tar --format=ustar --sort=name --mtime="@$epoch" --owner=0 --group=0 --numeric-owner -C "$stage" -cf "$temporary_tar" "$name"
+gzip -n < "$temporary_tar" > "$temporary"
+rm -f -- "$temporary_tar"
+gzip -t "$temporary"
+validation="$stage/validation"
+mkdir -p "$validation"
+tar -xzf "$temporary" -C "$validation"
+test "$("$validation/$name/gotth-extension-translate" --version)" = "$version"
+(cd "$validation/$name" && sha256sum -c SHA256SUMS >/dev/null)
 archive="$output/$name.tar.gz"
-[ ! -e "$archive" ] || { echo 'artifact already exists' >&2; exit 1; }
+sidecar="$archive.sha256"
+[ ! -e "$archive" ] && [ ! -e "$sidecar" ] || { echo 'artifact or checksum sidecar already exists' >&2; exit 1; }
+digest=$(sha256sum "$temporary" | cut -d' ' -f1)
+printf '%s  %s\n' "$digest" "$name.tar.gz" > "$temporary.sha256"
+(cd "$stage" && sha256sum -c "$name.tar.gz.sha256" >/dev/null)
 ln "$temporary" "$archive"
-sync -d "$archive" "$output"
-printf '%s  %s\n' "$(sha256sum "$archive" | cut -d' ' -f1)" "$archive"
+published_archive=1
+ln "$temporary.sha256" "$sidecar"
+published_sidecar=1
+sync -d "$archive" "$sidecar" "$output"
+published_archive=
+published_sidecar=
+cat "$sidecar"

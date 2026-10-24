@@ -1,5 +1,5 @@
 # translation.contract
 
-Status: implemented; verification and admission pending.
+Status: committed and verified release candidate; publication pending.
 
-The v1 source, owned interface, local adapter, tests, and release materials are present. Exact development-host evidence and two clean review passes must be sealed before admission. Commit, push, tag, Forgejo release, gotth-translate production adoption, consumer integration, deployment, and any GitHub mirror handoff remain separate.
+The v1 source, owned interface, local adapter, tests, and release materials are present at one exact clean commit. Revision-matched development-host and clean-clone evidence, history-aware secret scanning, and two clean review passes are sealed externally. Push, tag, Forgejo release, gotth-translate production adoption, consumer integration, deployment, and any GitHub mirror handoff remain separate.

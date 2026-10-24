@@ -18,6 +18,6 @@ The host provides absolute private files through GOTTH_EXTENSION_CONFIG_FILE, GO
 
 Every RPC needs a deadline and printable-ASCII x-gotth-service-token before its handler runs. Translate also checks x-gotth-session-sha256 inside the method. CACHE_CLASS_NONE forbids post-call retention; CACHE_CLASS_REQUEST permits only same-RPC memoization. Source or translated text, raw MIME, attachments, Markdown structure, paths, object keys, and credentials must never be placed in configuration, logs, errors, metrics, or evidence.
 
-Run lightweight checks with make verify. Run make verify-heavy only on the designated development host. Build a deterministic archive with scripts/build-artifact.sh 1.0.0 OUTPUT_DIR. The tree is implemented but untagged, unpublished, and undeployed; see docs/release/RELEASING.md.
+Run lightweight checks with make verify. Run make verify-heavy only on the designated development host. Build a deterministic archive and portable checksum sidecar with scripts/build-artifact.sh 1.0.0 OUTPUT_DIR. The committed candidate is untagged, unpublished, and undeployed; see docs/release/RELEASING.md.
 
 Licensed under MIT. Exact dependency licenses/notices are inventoried under docs/release/ and packaged under THIRD_PARTY_LICENSES in every archive.

@@ -6,5 +6,5 @@
 4. The Unix-only gotth-translate adapter, deterministic mock provider, and hostile whole-response validation are implemented.
 5. Bounds, cancellation, deadlines, concurrency, redaction, no-egress, consumer boundaries, allocation/latency, process lifecycle, and reproducible artifacts have tests.
 6. MIT license, dependency inventory, SPDX SBOM, provenance, release, and rollback records exist.
-7. Final development-host verification and evidence sealing are required before source admission.
-8. Commit, push, tag, Forgejo hosted release, deployment, remote providers, jobs, product UI, and any later GitHub mirror handoff remain separate authorized work.
+7. The committed source candidate has revision-matched development-host verification, clean-clone verification, history-aware secret scanning, two clean reviews, deterministic release assets, and a sealed external evidence bundle.
+8. Push, tag, Forgejo hosted release, deployment, remote providers, jobs, product UI, consumer migration, and any later GitHub mirror handoff remain separate authorized work.

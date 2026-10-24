@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased — v1.0.0 candidate (2026-10-23)
+## v1.0.0 release candidate — untagged and unpublished (2026-10-24)
 
 - Added the owned gotth.translation.v1 unary translation contract and generated Go bindings.
 - Selected published gotth-extensions v1.0.0 and gotth-sdk v1.0.0 without replacements or local control copies.
@@ -8,4 +8,5 @@
 - Added a supervisor-connected Unix-only gotth-translate adapter with pinned peer credentials, pre-token HMAC readiness proof, no pathname redial, exact model identity, no remote egress, and no application/service-config retry path; gRPC transparent proven-unprocessed retry remains possible.
 - Added pre-handler auth, blocked-audit, immediate terminate/restart, socket-substitution, hostile backend, consumer-fixture, redaction, no-egress, descriptor, allocation, latency, fuzz, and reproducible-artifact checks.
 - Selected MIT and added packaged third-party license/notice texts, exact SPDX/toolchain/provenance records, and release/upgrade/rollback procedures.
-- No commit, push, tag, release, credential, live provider, product repository, or deployment action was performed.
+- Hardened archive construction so a failed tar stage cannot be hidden by a successful compressor, validated each completed archive before publication, added an injected tar-failure regression, and emitted a portable basename-only checksum sidecar.
+- Committed and revision-verified the source candidate. No push, tag, hosted release, credential, live provider, product-repository change, or deployment was performed.

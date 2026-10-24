@@ -4,7 +4,7 @@ project = "gotth-extension-translate"
 [[features]]
 id = "translation.contract"
 path = "workflow/features/translation-contract"
-status = "implemented"
+status = "release_candidate"
 depends_on = ["gotth-extensions@v1.0.0", "gotth-sdk@v1.0.0"]
 prd = "docs/prd.md"
 architecture = "docs/architecture.md"
@@ -12,5 +12,7 @@ implementation = "docs/implementation-spec.md"
 required_verification = ["format", "unit and hostile tests", "race", "repeat and shuffle", "fuzz smoke", "coverage review", "vet", "build", "compiled process", "no egress", "allocation and latency", "reproducible artifact", "clean clone", "dependency and security scans", "two cold reviews"]
 
 [release]
-stage = "unreleased"
+stage = "candidate"
+version = "1.0.0"
 tag = ""
+published = false
